@@ -12,6 +12,9 @@ IGNORE_TAGS = {
     'br',
     'link',
     'hr',
+    'http',  # wiki specific content markup tag
+    'https',
+    'doi',
 }
 
 
@@ -28,6 +31,8 @@ class TagsCounter(HTMLParser):
         """
         Count open tags
         """
+        if ':' in tag:  # wiki special tags contain ':', but we need to filter them out
+            tag = tag.split(':')[0]
         self.tagsopen[tag] += 1
 
     def handle_endtag(self, tag):
