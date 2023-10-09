@@ -36,6 +36,7 @@ from wiki.core.plugins.base import PluginSettingsFormMixin
 from wiki.editors import getEditor
 
 from .forms_account_handling import UserCreationForm, UserUpdateForm
+from .html_utils import find_unclosed_html_tags
 
 validate_slug_numbers = RegexValidator(
     r"^[0-9]+$",
@@ -322,6 +323,9 @@ class EditForm(forms.Form, SpamProtectionMixin):
         ):
             raise forms.ValidationError(gettext("No changes made. Nothing to save."))
         self.check_spam()
+        unclosed_tags = find_unclosed_html_tags(self.cleaned_data["content"])
+        if unclosed_tags:
+            raise forms.ValidationError(gettext("Found unclosed HTML tags, save aborted. Please fix the following unclosed tags: ") + ' '.join(unclosed_tags))
         return self.cleaned_data
 
 
